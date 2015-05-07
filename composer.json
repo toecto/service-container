@@ -1,0 +1,15 @@
+{
+    "name": "reactor/service-container",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maxim Popov",
+            "email": "toecto@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Reactor\\ServiceContainer\\": "src/"
+        }
+    }
+}
