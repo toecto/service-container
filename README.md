@@ -1,8 +1,8 @@
 # service-container
 
-Yet another event dispatcher.
+Yet another service container.
 
-Lightvert, support Event Name routing with wild cards, similar as RabbitMQ wild cards
+Supports nested scopes
 
 ## Installation with composer:
 
