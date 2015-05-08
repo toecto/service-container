@@ -8,18 +8,15 @@ class ServiceContainer extends ValueContainer {
 
     protected $loading = array();
 
-    public function setService($name, $value = null) {
-        if ($value === null) {
-            return $this->values[$name] = new ServiceProvider();
-        }
+    public function addService($name, $value = null) {
         if (is_a($value, 'Reactor\\ServiceContainer\\ServiceProvider')) {
             return $this->values[$name] = $value;
         }
         return $this->values[$name] = new ServiceProvider($value);
     }
 
-    public function getOwnValue($name) {
-        $value = $this->values[$name];
+    public function get($name) {
+        $value = parent::get($name);
         if (is_a($value, 'Reactor\\ServiceContainer\\ServiceProvider')) {
             if (isset($this->loading[$name])) {
                 throw new CircularReferenceExeption($name);
@@ -30,10 +27,6 @@ class ServiceContainer extends ValueContainer {
             unset($this->loading[$name]);
         }
         return $value;
-    }
-
-    public function __get($name) {
-        return $this->getService($name);
     }
 
 }

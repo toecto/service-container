@@ -7,36 +7,48 @@ use \Reactor\ServiceContainer\Exceptions\ServiceNotFoundExeption;
 class ServiceScope extends ServiceContainer {
     
     private $parent_scope = null;
-    private $sub_scopes = array();
 
     public function __construct($parent = null) {
         $this->setParentScope($parent);
     }
 
+    public function setParentScope($parent) {
+        $this->parent_scope = $parent;
+    }
+
     public function addScope($id, $scope = null) {
-        $this->sub_scopes[$id] = $scope ?: new ServiceScope($this);
-        return $this->sub_scopes[$id];
+        return $this->set($id, $scope ?: new ServiceScope($this));
     }
 
-    public function getService($service_name) {
-        $scope = $this;
-        $service = $scope->getOwnService($service_name);
-        while (!$service) {
-            $scope = $this->parent_scope;
-            if (!$scope) {
-                throw new ServiceNotFoundExeption('Service "'.$service_name.'" not found');
-            }
-            $service = $scope->getOwnService($service_name);
+    public function get($service_name) {
+        if (parent::has($service_name)) {
+            return parent::get($service_name);    
         }
-        return $service;
+        if ($this->parent_scope) {
+            return $this->parent_scope->get($service_name);
+        }
+        throw new ServiceNotFoundExeption('Service "'.$service_name.'" not found');
     }
 
-    public function getOwnService($service_name) {
-        return isset($this->services[$service_name]) ? $this->services[$service_name] : null;
+    public function has($service_name) {
+        if (parent::has($service_name)) {
+            return true;
+        }
+        if ($this->parent_scope) {
+            return $this->parent_scope->has($service_name);
+        }
+        return false;
     }
 
-    public function getParentScope() {
-        return $this->parent_scope;
+    public function open($path) {
+        $node = $this;
+        while($node->parent != null) {
+            $node = $node->parent;
+        }
+        foreach($path as $name) {
+            $node = $node->get($name);
+        }
+        return $node;
     }
 
 }

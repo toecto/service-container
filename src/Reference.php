@@ -5,7 +5,7 @@ namespace Reactor\ServiceContainer;
 class Reference {
 
     protected $name;
-    protected $path;
+    protected $path = null;
 
     public function __construct($name = null, $path = null) {
         $this->name = $name;
@@ -14,12 +14,12 @@ class Reference {
 
     public function resolve($container) {
         if ($this->path) {
-            $container = $container->openPath($this->path);
+            $container = $container->open($this->path);
         } 
         if (!$this->name) {
             return $container;
         }
-        return $container->getValue($this->name);
+        return $container->get($this->name);
     }
 
 }
