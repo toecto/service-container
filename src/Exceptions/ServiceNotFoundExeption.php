@@ -2,4 +2,4 @@
 
 namespace Reactor\ServiceContainer\Exceptions;
 
-class EntityNotFoundExeption extends \Exception {}
+class ServiceNotFoundExeption extends \Exception {}
