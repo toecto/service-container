@@ -2,8 +2,6 @@
 
 Yet another service container.
 
-Supports nested scopes
-
 ## Installation with composer:
 
 ```javascript
