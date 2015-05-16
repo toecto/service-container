@@ -95,7 +95,7 @@ class ServiceProvider implements ServiceProviderInterface {
             }
         } elseif (is_object($data)) {
             if (is_a($data, 'Reactor\\ServiceContainer\\Reference')) {
-                $data = $data->resolve($container);
+                $data = $data->get($container);
             }
         }
         return $data;

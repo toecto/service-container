@@ -2,7 +2,7 @@
 
 namespace Reactor\ServiceContainer;
 
-class Reference {
+class Reference implements ServiceProviderInterface {
 
     protected $name;
     protected $loading = false;
@@ -11,7 +11,7 @@ class Reference {
         $this->name = $name;
     }
 
-    public function resolve($container) {
+    public function get($container) {
         if ($this->loading) {
             throw new CircularReferenceExeption(implode("-", (array)$this->name));
         }
