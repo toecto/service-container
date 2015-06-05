@@ -4,11 +4,6 @@ namespace Reactor\ServiceContainer;
 
 class ServiceProvider implements ServiceProviderInterface {
 
-    protected $arguments = array();
-    protected $igniter = null;
-    protected $factory = null;
-    protected $factory_arguments = array();
-
     protected $scenario = array();
     protected $shared = false;
     protected $instance = null;
@@ -75,7 +70,7 @@ class ServiceProvider implements ServiceProviderInterface {
     }
 
     public function createInstance($container) {
-        $scenario = $this->resolveReferences($container, $this->scenario);
+        $scenario = $this->resolveReferences($this->scenario, $container);
         $instance = null;
         foreach($scenario as $step) {
             $instance = call_user_func_array(array($this, 'step_'.$step['type']), array($instance, $step['igniter'], $step['arguments']));
@@ -84,7 +79,20 @@ class ServiceProvider implements ServiceProviderInterface {
         return $instance;
     }
 
-    public function step_create($instance, $igniter, $arguments) {
+    public function resolveReferences($data, $container) {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->resolveReferences($value, $container);
+            }
+        } elseif (is_object($data)) {
+            if (is_a($data, 'Reactor\\ServiceContainer\\Reference')) {
+                $data = $data->get($container);
+            }
+        }
+        return $data;
+    }
+
+    protected function step_create($instance, $igniter, $arguments) {
         if (is_callable($igniter)) {
             $instance = call_user_func_array($igniter, $arguments);
         } elseif (is_string($igniter)) {
@@ -96,7 +104,7 @@ class ServiceProvider implements ServiceProviderInterface {
         return $instance;
     }
 
-    public function step_factory($instance, $igniter, $arguments) {
+    protected function step_factory($instance, $igniter, $arguments) {
         if (is_object($instance)) {
             return call_user_func_array(array($instance, $igniter), $arguments);
         } else {
@@ -104,26 +112,13 @@ class ServiceProvider implements ServiceProviderInterface {
         }
     }
 
-    public function step_call($instance, $igniter, $arguments) {
+    protected function step_call($instance, $igniter, $arguments) {
         call_user_func_array(array($instance, $igniter), $arguments);
         return $instance;
     }
 
-    public function step_configurator($instance, $igniter, $arguments) {
+    protected function step_configurator($instance, $igniter, $arguments) {
         return call_user_func_array($igniter, array_merge(array($instance), $arguments));
-    }
-
-    public function resolveReferences($container, $data) {
-        if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                $data[$key] = $this->resolveReferences($container, $value);
-            }
-        } elseif (is_object($data)) {
-            if (is_a($data, 'Reactor\\ServiceContainer\\Reference')) {
-                $data = $data->get($container);
-            }
-        }
-        return $data;
     }
 
 }

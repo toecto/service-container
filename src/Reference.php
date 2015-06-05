@@ -17,7 +17,11 @@ class Reference implements ServiceProviderInterface {
         }
         $this->loading = true;
 
-        $val = $container->get($this->name);
+        if (empty($this->name)) {
+            $val = $container;
+        } else {
+            $val = $container->get($this->name);
+        }
 
         $this->loading = false;
         return $val;
