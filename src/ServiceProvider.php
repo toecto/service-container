@@ -118,7 +118,8 @@ class ServiceProvider implements ServiceProviderInterface {
     }
 
     protected function step_configurator($instance, $igniter, $arguments) {
-        return call_user_func_array($igniter, array_merge(array($instance), $arguments));
+        call_user_func_array($igniter, array_merge(array($instance), $arguments));
+        return $instance;
     }
 
 }
